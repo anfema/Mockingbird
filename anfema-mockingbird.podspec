@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name         = "mockingbird"
+  s.name         = "anfema-mockingbird"
   s.version      = "1.0.0"
   s.summary      = "HTTP-Response mocking for iOS and OS X."
   s.description  = <<-DESC
