@@ -1,0 +1,10 @@
+{
+  "args": {
+    "arg1": "foobar"
+  }, 
+  "headers": {
+    "Host": "httpbin.org"
+  }, 
+  "origin": "127.0.0.1", 
+  "url": "https://httpbin.org/get?arg1=foobar"
+}

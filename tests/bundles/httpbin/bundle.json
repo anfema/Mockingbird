@@ -1,0 +1,49 @@
+[
+	{
+		"request": {
+			"method": "GET",
+			"url": "://httpbin.org/ip"
+		},
+
+		"response" : {
+			"code": 200,
+			"file": "ip.json",
+			"mime_type": "application/json"
+		}
+	},
+
+
+	{
+		"request": {
+			"method": "GET",
+			"url": "://httpbin.org/get",
+			"parameters": {
+				"arg1": "test",
+				"arg2": "test"
+			}
+		},
+
+		"response" : {
+			"code": 200,
+			"file": "get_arg.json",
+			"mime_type": "application/json"
+		}
+	},
+
+	{
+		"request": {
+			"method": "GET",
+			"url": "://httpbin.org/get",
+			"parameters": {
+				"arg1": "foobar"
+			}
+		},
+
+		"response" : {
+			"code": 200,
+			"file": "get_arg1.json",
+			"mime_type": "application/json"
+		}
+	}
+
+]
