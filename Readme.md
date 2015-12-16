@@ -14,7 +14,7 @@ MockingBird is essentially only one Swift file (`mockingbird.swift`) but needs s
 
 ### Cocoapods
 
-Just include `pod 'mockingbird', '~> 1.0'` in your `Podfile`
+Just include `pod 'anfema-mockingbird', '~> 1.0'` in your `Podfile`
 
 ### Manual
 
@@ -87,7 +87,7 @@ To include a Mock-Bundle into an unit test, create your bundle somewhere and add
 Then add the following code to your test (example for _Alamofire_):
 
 ~~~swift
-import mockingbird
+import anfema_mockingbird  // needed only for install via cocoapods
 import Alamofire
 
 class mockingbirdTests: XCTestCase {
