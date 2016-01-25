@@ -51,7 +51,7 @@ Bundle JSON is a JSON Array with Objects that contain two base objects, `request
 
 - `method`: (optional) HTTP method, defaults to `GET`
 - `url`: URL to mock, start with `://` (skip the http)
-- `parameters`: (optional) JSON object with key-value items for query parameters, defaults to empty
+- `parameters`: (optional) JSON object with key-value items for query parameters, defaults to empty, if the parameter value is `null` it just checks if the parameter is available but not which value it has
 
 #### response
 

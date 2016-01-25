@@ -14,7 +14,7 @@ import DEjson
 
 internal struct MockBundleEntry {
     var url:String!
-    var queryParameters = [String:String]()
+    var queryParameters = [String:String?]()
     var requestMethod   = "GET"
     
     var responseCode:Int = 200
@@ -40,6 +40,10 @@ internal struct MockBundleEntry {
                 for item in query {
                     if case .JSONString(let value) = item.1 {
                         self.queryParameters[item.0] = value
+                    } else if case .JSONNull = item.1 {
+                        self.queryParameters[item.0] = nil as String?
+                    } else {
+                        print("Query parameter \(item.0) has invalid value!")
                     }
                 }
         }
@@ -226,7 +230,10 @@ extension MockingBird {
                     for component in queryItems {
                         var found = false
                         for q in entry.queryParameters {
-                            if component.name == q.0 && component.value == q.1 {
+                            if component.name == q.0 && q.1 == nil {
+                                found = true
+                                break
+                            } else if component.name == q.0 && component.value == q.1 {
                                 found = true
                                 break
                             }
