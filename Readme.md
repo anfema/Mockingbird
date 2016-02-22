@@ -12,7 +12,7 @@ Answers are packages in so called Mock-Bundles (just a directory and some files)
 
 MockingBird is essentially only one Swift file (`mockingbird.swift`) but needs some Mock-Bundles to work.
 
-### Cocoapods
+### CocoaPods
 
 Just include `pod 'anfema-mockingbird', '~> 1.0'` in your `Podfile`
 
