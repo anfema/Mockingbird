@@ -78,6 +78,11 @@ public class MockingBird: NSURLProtocol {
     static var currentMockBundle: [MockBundleEntry]?
     static var currentMockBundlePath: String?
     
+    // If this is true, we'll claim to answer all URL requests.
+    // If this is false, URLs that don't match will be passed on
+    //      through to normal handlers.
+    static var handleAllRequests: Bool = false
+
     public enum Error: ErrorType {
         case MockBundleNotFound
         case InvalidMockBundle
@@ -151,7 +156,7 @@ extension MockingBird {
         if let _ = self.getBundleItem(request.URL!, method: request.HTTPMethod!) {
             return true
         }
-        return false
+        return self.handleAllRequests
     }
 
     public override class func canonicalRequestForRequest(request: NSURLRequest) -> NSURLRequest {
@@ -167,7 +172,37 @@ extension MockingBird {
     public override func startLoading() {
         // fetch item
         guard let entry = MockingBird.getBundleItem(self.request.URL!, method: self.request.HTTPMethod!) else {
-            self.client!.URLProtocol(self, didFailWithError: NSError.init(domain: "mockingbird", code: 1000, userInfo:nil))
+            
+            if MockingBird.handleAllRequests {
+                // We're handling all requests, but no bundle item found
+                // so reply with server error 501 and no data
+                var headers = [String: String]()
+                headers["Content-Type"] = "text/plain"
+                
+                let errorMsg = "Mockingbird response not available.  Please add a response to the bundle at \(MockingBird.currentMockBundlePath)."
+                let data = errorMsg.dataUsingEncoding(NSUTF8StringEncoding)
+                if let data = data {
+                    headers["Content-Length"] = "\(data.length)"
+                }
+                let response = NSHTTPURLResponse(URL: self.request.URL!,
+                                                 statusCode: 501,
+                                                 HTTPVersion: "HTTP/1.1",
+                                                 headerFields: headers)!
+                
+                // send response
+                self.client!.URLProtocol(self, didReceiveResponse: response, cacheStoragePolicy: .NotAllowed)
+                
+                // send response data if available
+                if let data = data {
+                    self.client!.URLProtocol(self, didLoadData: data)
+                }
+                
+                // finish up
+                self.client!.URLProtocolDidFinishLoading(self)
+
+            } else {
+                self.client!.URLProtocol(self, didFailWithError: NSError.init(domain: "mockingbird", code: 1000, userInfo:nil))
+            }
             return
         }
         

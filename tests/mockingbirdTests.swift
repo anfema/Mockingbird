@@ -71,6 +71,19 @@ class mockingbirdTests: XCTestCase {
         self.waitForExpectationsWithTimeout(2.0, handler: nil)
     }
     
+    func testHandleAll() {
+        let expectation = self.expectationWithDescription("testHandleAll")
+
+        MockingBird.handleAllRequests = true
+        
+        self.alamofire.request(.GET, "http://httpbin.org/html").response { (request, response, data, error) in
+            XCTAssertTrue(response!.statusCode == 501)
+            expectation.fulfill()
+        }
+        
+        self.waitForExpectationsWithTimeout(2.0, handler: nil)
+    }
+
     func testMock() {
         let expectation = self.expectationWithDescription("testMock")
         
