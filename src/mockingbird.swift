@@ -81,7 +81,7 @@ public class MockingBird: NSURLProtocol {
     // If this is true, we'll claim to answer all URL requests.
     // If this is false, URLs that don't match will be passed on
     //      through to normal handlers.
-    static var handleAllRequests: Bool = false
+    public static var handleAllRequests: Bool = false
 
     public enum Error: ErrorType {
         case MockBundleNotFound
