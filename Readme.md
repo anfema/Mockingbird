@@ -129,3 +129,13 @@ NSURLProtocol.registerClass(MockingBird)
 ~~~
 
 But beware, if you're using an `NSURLSession` with this set, it will not work for the sessions, this one works only for the old version without `NSURLSession`
+
+#### Handle all requests
+
+By default, if a request does not match an entry in the current Mocking-Bundle, the request is passed through to the network as usual.  If you would like any request that does not match to fail, set the `handleAllRequests` property to true.
+
+~~~swift
+MockingBird.handleAllRequests = true
+~~~
+
+When this property is set to true, requests that do not match the current Mocking-Bundle will fail with an HTTP error status of 501.
