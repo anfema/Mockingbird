@@ -23,24 +23,24 @@ internal struct MockBundleEntry {
     var responseMime:String?
     
     init(json: JSONObject) throws {
-        guard case .JSONDictionary(let dict) = json where (dict["request"] != nil && dict["response"] != nil),
-              case .JSONDictionary(let request) = dict["request"]! where request["url"] != nil,
-              case .JSONDictionary(let response) = dict["response"]! where response["code"] != nil,
-              case .JSONString(let url) = request["url"]!,
-              case .JSONNumber(let code) = response["code"]!
+        guard case .jsonDictionary(let dict) = json, (dict["request"] != nil && dict["response"] != nil),
+              case .jsonDictionary(let request) = dict["request"]!, request["url"] != nil,
+              case .jsonDictionary(let response) = dict["response"]!, response["code"] != nil,
+              case .jsonString(let url) = request["url"]!,
+              case .jsonNumber(let code) = response["code"]!
             else {
-            throw MockingBird.Error.InvalidBundleDescriptionFile
+            throw MockingBird.MBError.invalidBundleDescriptionFile
         }
         
         self.url = url
         self.responseCode = Int(code)
 
         if let q = request["parameters"],
-           case .JSONDictionary(let query) = q {
+           case .jsonDictionary(let query) = q {
                 for item in query {
-                    if case .JSONString(let value) = item.1 {
+                    if case .jsonString(let value) = item.1 {
                         self.queryParameters[item.0] = value
-                    } else if case .JSONNull = item.1 {
+                    } else if case .jsonNull = item.1 {
                         self.queryParameters[item.0] = nil as String?
                     } else {
                         print("Query parameter \(item.0) has invalid value!")
@@ -49,62 +49,62 @@ internal struct MockBundleEntry {
         }
         
         if let q = request["method"],
-            case .JSONString(let method) = q {
+            case .jsonString(let method) = q {
                 self.requestMethod = method
         }
 
         if let q = response["headers"],
-            case .JSONDictionary(let headers) = q {
+            case .jsonDictionary(let headers) = q {
                 for item in headers {
-                    if case .JSONString(let value) = item.1 {
+                    if case .jsonString(let value) = item.1 {
                         self.responseHeaders[item.0] = value
                     }
                 }
         }
 
         if let q = response["file"],
-            case .JSONString(let file) = q {
+            case .jsonString(let file) = q {
                 self.responseFile = file
         }
         
         if let q = response["mime_type"],
-            case .JSONString(let mime) = q {
+            case .jsonString(let mime) = q {
                 self.responseMime = mime
         }
     }
 }
 
-public class MockingBird: NSURLProtocol {
+open class MockingBird: URLProtocol {
     static var currentMockBundle: [MockBundleEntry]?
     static var currentMockBundlePath: String?
     
     // If this is true, we'll claim to answer all URL requests.
     // If this is false, URLs that don't match will be passed on
     //      through to normal handlers.
-    public static var handleAllRequests: Bool = false
+    open static var handleAllRequests: Bool = false
 
-    public enum Error: ErrorType {
-        case MockBundleNotFound
-        case InvalidMockBundle
-        case InvalidBundleDescriptionFile
+    public enum MBError: Error {
+        case mockBundleNotFound
+        case invalidMockBundle
+        case invalidBundleDescriptionFile
     }
     
     /// Register MockingBird with a NSURLSession
     ///
     /// - parameter session: the session to mock
-    public class func registerInSession(session: NSURLSession) {
+    open class func registerInSession(_ session: URLSession) {
         self.registerInConfig(session.configuration)
     }
 
     /// Register MockingBird in a NSURLSessionConfiguration
     ///
     /// - parameter config: session configuration to mock
-    public class func registerInConfig(config: NSURLSessionConfiguration) {
+    open class func registerInConfig(_ config: URLSessionConfiguration) {
         var protocolClasses = config.protocolClasses
         if protocolClasses == nil {
             protocolClasses = [AnyClass]()
         }
-        protocolClasses!.insert(MockingBird.self, atIndex: 0)
+        protocolClasses!.insert(MockingBird.self, at: 0)
         config.protocolClasses = protocolClasses
     }
 
@@ -112,7 +112,7 @@ public class MockingBird: NSURLProtocol {
     ///
     /// - parameter bundlePath: path to the bundle
     /// - throws: MockingBird.Error when bundle could not be loaded
-    public class func setMockBundle(bundlePath: String?) throws {
+    open class func setMockBundle(_ bundlePath: String?) throws {
         guard let bundlePath = bundlePath else {
             self.currentMockBundle = nil
             self.currentMockBundlePath = nil
@@ -120,25 +120,25 @@ public class MockingBird: NSURLProtocol {
         }
         
         do {
-            var isDir:ObjCBool = false
-            if NSFileManager.defaultManager().fileExistsAtPath(bundlePath, isDirectory: &isDir) && isDir {
+            var isDir = ObjCBool(false)
+            if FileManager.default.fileExists(atPath: bundlePath, isDirectory: &isDir) && isDir.boolValue {
                 let jsonString = try String(contentsOfFile: "\(bundlePath)/bundle.json")
 
                 let jsonObject = JSONDecoder(jsonString).jsonObject
-                if case .JSONArray(let array) = jsonObject {
+                if case .jsonArray(let array) = jsonObject {
                     self.currentMockBundle = try array.map { item -> MockBundleEntry in
                         return try MockBundleEntry(json: item)
                     }
                 } else {
-                    throw MockingBird.Error.InvalidBundleDescriptionFile
+                    throw MockingBird.MBError.invalidBundleDescriptionFile
                 }
             } else {
-                throw MockingBird.Error.MockBundleNotFound
+                throw MockingBird.MBError.mockBundleNotFound
             }
-        } catch MockingBird.Error.InvalidBundleDescriptionFile {
-            throw MockingBird.Error.InvalidBundleDescriptionFile
+        } catch MockingBird.MBError.invalidBundleDescriptionFile {
+            throw MockingBird.MBError.invalidBundleDescriptionFile
         } catch {
-            throw MockingBird.Error.InvalidMockBundle
+            throw MockingBird.MBError.invalidMockBundle
         }
         self.currentMockBundlePath = bundlePath
     }
@@ -146,32 +146,32 @@ public class MockingBird: NSURLProtocol {
 
 // MARK: - URL Protocol overrides
 extension MockingBird {
-    public override class func canInitWithRequest(request: NSURLRequest) -> Bool {
+    open override class func canInit(with request: URLRequest) -> Bool {
         // we can only answer if we have a mockBundle
         if self.currentMockBundle == nil {
             return false
         }
         
         // we can answer all http and https requests
-        if let _ = self.getBundleItem(request.URL!, method: request.HTTPMethod!) {
+        if let _ = self.getBundleItem(request.url!, method: request.httpMethod!) {
             return true
         }
         return self.handleAllRequests
     }
 
-    public override class func canonicalRequestForRequest(request: NSURLRequest) -> NSURLRequest {
+    open override class func canonicalRequest(for request: URLRequest) -> URLRequest {
         // canonical request is same as request
         return request
     }
 
-    public override class func requestIsCacheEquivalent(a: NSURLRequest, toRequest b: NSURLRequest) -> Bool {
+    open override class func requestIsCacheEquivalent(_ a: URLRequest, to b: URLRequest) -> Bool {
         // nothing is cacheable
         return false
     }
     
-    public override func startLoading() {
+    open override func startLoading() {
         // fetch item
-        guard let entry = MockingBird.getBundleItem(self.request.URL!, method: self.request.HTTPMethod!) else {
+        guard let entry = MockingBird.getBundleItem(self.request.url!, method: self.request.httpMethod!) else {
             
             if MockingBird.handleAllRequests {
                 // We're handling all requests, but no bundle item found
@@ -180,28 +180,28 @@ extension MockingBird {
                 headers["Content-Type"] = "text/plain"
                 
                 let errorMsg = "Mockingbird response not available.  Please add a response to the bundle at \(MockingBird.currentMockBundlePath)."
-                let data = errorMsg.dataUsingEncoding(NSUTF8StringEncoding)
+                let data = errorMsg.data(using: String.Encoding.utf8)
                 if let data = data {
-                    headers["Content-Length"] = "\(data.length)"
+                    headers["Content-Length"] = "\(data.count)"
                 }
-                let response = NSHTTPURLResponse(URL: self.request.URL!,
+                let response = HTTPURLResponse(url: self.request.url!,
                                                  statusCode: 501,
-                                                 HTTPVersion: "HTTP/1.1",
+                                                 httpVersion: "HTTP/1.1",
                                                  headerFields: headers)!
                 
                 // send response
-                self.client!.URLProtocol(self, didReceiveResponse: response, cacheStoragePolicy: .NotAllowed)
+                self.client!.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
                 
                 // send response data if available
                 if let data = data {
-                    self.client!.URLProtocol(self, didLoadData: data)
+                    self.client!.urlProtocol(self, didLoad: data)
                 }
                 
                 // finish up
-                self.client!.URLProtocolDidFinishLoading(self)
+                self.client!.urlProtocolDidFinishLoading(self)
 
             } else {
-                self.client!.URLProtocol(self, didFailWithError: NSError.init(domain: "mockingbird", code: 1000, userInfo:nil))
+                self.client!.urlProtocol(self, didFailWithError: NSError.init(domain: "mockingbird", code: 1000, userInfo:nil))
             }
             return
         }
@@ -213,10 +213,10 @@ extension MockingBird {
         }
         
         // load data
-        var data: NSData? = nil
+        var data: Data? = nil
         if let f = entry.responseFile {
             do {
-                data = try NSData(contentsOfFile: "\(MockingBird.currentMockBundlePath!)/\(f)", options: .DataReadingMappedIfSafe)
+                data = try Data(contentsOf: URL(fileURLWithPath: "\(MockingBird.currentMockBundlePath!)/\(f)"), options: .mappedIfSafe)
             } catch {
                 data = nil
             }
@@ -226,35 +226,35 @@ extension MockingBird {
         var headers = entry.responseHeaders
         headers["Content-Type"] = mime
         if let data = data {
-            headers["Content-Length"] = "\(data.length)"
+            headers["Content-Length"] = "\(data.count)"
         }
-        let response = NSHTTPURLResponse(URL: self.request.URL!, statusCode: entry.responseCode, HTTPVersion: "HTTP/1.1", headerFields: headers)!
+        let response = HTTPURLResponse(url: self.request.url!, statusCode: entry.responseCode, httpVersion: "HTTP/1.1", headerFields: headers)!
         
         // send response
-        self.client!.URLProtocol(self, didReceiveResponse: response, cacheStoragePolicy: .NotAllowed)
+        self.client!.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         
         // send response data if available
         if let data = data {
-            self.client!.URLProtocol(self, didLoadData: data)
+            self.client!.urlProtocol(self, didLoad: data)
         }
         
         // finish up
-        self.client!.URLProtocolDidFinishLoading(self)
+        self.client!.urlProtocolDidFinishLoading(self)
     }
     
-    public override func stopLoading() {
+    open override func stopLoading() {
         // do nothing
     }
     
-    private class func getBundleItem(inUrl: NSURL, method: String) -> MockBundleEntry? {
-        let url = NSURLComponents(URL: inUrl, resolvingAgainstBaseURL: false)!
+    fileprivate class func getBundleItem(_ inUrl: URL, method: String) -> MockBundleEntry? {
+        let url = URLComponents(url: inUrl, resolvingAgainstBaseURL: false)!
         
         // find entry that matches
         for entry in MockingBird.currentMockBundle! {
             // url match and request method match
-            var urlPart = "://\(url.host!)\(url.path!)"
+            var urlPart = "://\(url.host!)\(url.path)"
             if let port = url.port {
-                urlPart = "://\(url.host!):\(port)\(url.path!)"
+                urlPart = "://\(url.host!):\(port)\(url.path)"
             }
             
             if entry.url == urlPart && entry.requestMethod == method {

@@ -12,21 +12,21 @@ import Alamofire
 import DEjson
 
 class mockingbirdTests: XCTestCase {
-    var alamofire: Alamofire.Manager! = nil
+    var alamofire: Alamofire.SessionManager! = nil
     
     override func setUp() {
         super.setUp()
         
-        let configuration: NSURLSessionConfiguration = NSURLSessionConfiguration.defaultSessionConfiguration()
-        configuration.requestCachePolicy = .ReloadIgnoringLocalCacheData
-        configuration.HTTPAdditionalHeaders = Alamofire.Manager.defaultHTTPHeaders
-        configuration.HTTPCookieAcceptPolicy = .Never
-        configuration.HTTPShouldSetCookies = false
+        let configuration: URLSessionConfiguration = URLSessionConfiguration.default
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.httpAdditionalHeaders = Alamofire.SessionManager.defaultHTTPHeaders
+        configuration.httpCookieAcceptPolicy = .never
+        configuration.httpShouldSetCookies = false
         
         MockingBird.registerInConfig(configuration)
-        self.alamofire = Alamofire.Manager(configuration: configuration)
-
-        let bundle = NSBundle(forClass: self.dynamicType).resourcePath! + "/bundles/httpbin"
+        self.alamofire = Alamofire.SessionManager(configuration: configuration)
+        
+        let bundle = Bundle(for: type(of: self)).resourcePath! + "/bundles/httpbin"
         do {
             try MockingBird.setMockBundle(bundle)
         } catch {
@@ -40,7 +40,7 @@ class mockingbirdTests: XCTestCase {
     }
     
     func testReal() {
-        let expectation = self.expectationWithDescription("testReal")
+        let expectation = self.expectation(description: "testReal")
         
         do {
             try MockingBird.setMockBundle(nil)
@@ -48,13 +48,13 @@ class mockingbirdTests: XCTestCase {
             XCTFail("Could not disable mock bundle")
         }
 
-        self.alamofire.request(.GET, "http://httpbin.org/ip").response { (request, response, data, error) in
-            if let data = data {
-                let jsonString = String(data: data, encoding: NSUTF8StringEncoding)
+        self.alamofire.request("http://httpbin.org/ip", method: .get).response { (response) in
+            if let data = response.data {
+                let jsonString = String(data: data, encoding: String.Encoding.utf8)
                 XCTAssertNotNil(jsonString)
                 let json = JSONDecoder(jsonString!).jsonObject
-                guard case .JSONDictionary(let dict) = json where dict["origin"] != nil,
-                      case .JSONString(let ip) = dict["origin"]! else {
+                guard case .jsonDictionary(let dict) = json, dict["origin"] != nil,
+                    case .jsonString(let ip) = dict["origin"]! else {
                         XCTFail("Invalid data returned")
                         expectation.fulfill()
                         return
@@ -68,32 +68,32 @@ class mockingbirdTests: XCTestCase {
             }
         }
         
-        self.waitForExpectationsWithTimeout(2.0, handler: nil)
+        self.waitForExpectations(timeout: 2.0, handler: nil)
     }
     
     func testHandleAll() {
-        let expectation = self.expectationWithDescription("testHandleAll")
+        let expectation = self.expectation(description: "testHandleAll")
 
         MockingBird.handleAllRequests = true
         
-        self.alamofire.request(.GET, "http://httpbin.org/html").response { (request, response, data, error) in
-            XCTAssertTrue(response!.statusCode == 501)
+        self.alamofire.request("http://httpbin.org/html", method: .get).response { (response) in
+            XCTAssertTrue(response.response!.statusCode == 501)
             expectation.fulfill()
         }
         
-        self.waitForExpectationsWithTimeout(2.0, handler: nil)
+        self.waitForExpectations(timeout: 2.0, handler: nil)
     }
 
     func testMock() {
-        let expectation = self.expectationWithDescription("testMock")
+        let expectation = self.expectation(description: "testMock")
         
-        self.alamofire.request(.GET, "http://httpbin.org/ip").response { (request, response, data, error) in
-            if let data = data {
-                let jsonString = String(data: data, encoding: NSUTF8StringEncoding)
+        self.alamofire.request("http://httpbin.org/ip", method: .get).response { (response) in
+            if let data = response.data {
+                let jsonString = String(data: data, encoding: String.Encoding.utf8)
                 XCTAssertNotNil(jsonString)
                 let json = JSONDecoder(jsonString!).jsonObject
-                guard case .JSONDictionary(let dict) = json where dict["origin"] != nil,
-                    case .JSONString(let ip) = dict["origin"]! else {
+                guard case .jsonDictionary(let dict) = json, dict["origin"] != nil,
+                    case .jsonString(let ip) = dict["origin"]! else {
                         XCTFail("Invalid data returned")
                         expectation.fulfill()
                         return
@@ -107,21 +107,21 @@ class mockingbirdTests: XCTestCase {
             }
         }
         
-        self.waitForExpectationsWithTimeout(2.0, handler: nil)
+        self.waitForExpectations(timeout: 2.0, handler: nil)
     }
 
     
     func testArguments() {
-        let expectation = self.expectationWithDescription("testArguments")
+        let expectation = self.expectation(description: "testArguments")
         
-        self.alamofire.request(.GET, "http://httpbin.org/get", parameters:["arg1": "test", "arg2": "test"]).response { (request, response, data, error) in
-            if let data = data {
-                let jsonString = String(data: data, encoding: NSUTF8StringEncoding)
+        self.alamofire.request("http://httpbin.org/get", method: .get, parameters: ["arg1": "test", "arg2": "test"]).response { (response) in
+            if let data = response.data {
+                let jsonString = String(data: data, encoding: String.Encoding.utf8)
                 XCTAssertNotNil(jsonString)
                 let json = JSONDecoder(jsonString!).jsonObject
-                guard case .JSONDictionary(let dict) = json where (dict["origin"] != nil && dict["args"] != nil),
-                      case .JSONString(let ip) = dict["origin"]!,
-                      case .JSONDictionary(let args) = dict["args"]! else {
+                guard case .jsonDictionary(let dict) = json, (dict["origin"] != nil && dict["args"] != nil),
+                    case .jsonString(let ip) = dict["origin"]!,
+                    case .jsonDictionary(let args) = dict["args"]! else {
                         XCTFail("Invalid data returned")
                         expectation.fulfill()
                         return
@@ -138,20 +138,20 @@ class mockingbirdTests: XCTestCase {
             }
         }
         
-        self.waitForExpectationsWithTimeout(2.0, handler: nil)
+        self.waitForExpectations(timeout: 2.0, handler: nil)
     }
     
     func testOtherArgument() {
-        let expectation = self.expectationWithDescription("testArguments")
+        let expectation = self.expectation(description: "testArguments")
         
-        self.alamofire.request(.GET, "http://httpbin.org/get", parameters:["arg1": "foobar"]).response { (request, response, data, error) in
-            if let data = data {
-                let jsonString = String(data: data, encoding: NSUTF8StringEncoding)
+        self.alamofire.request("http://httpbin.org/get", method: .get, parameters: ["arg1": "foobar"]).response { (response) in
+            if let data = response.data {
+                let jsonString = String(data: data, encoding: String.Encoding.utf8)
                 XCTAssertNotNil(jsonString)
                 let json = JSONDecoder(jsonString!).jsonObject
-                guard case .JSONDictionary(let dict) = json where (dict["origin"] != nil && dict["args"] != nil),
-                    case .JSONString(let ip) = dict["origin"]!,
-                    case .JSONDictionary(let args) = dict["args"]! else {
+                guard case .jsonDictionary(let dict) = json, (dict["origin"] != nil && dict["args"] != nil),
+                    case .jsonString(let ip) = dict["origin"]!,
+                    case .jsonDictionary(let args) = dict["args"]! else {
                         XCTFail("Invalid data returned")
                         expectation.fulfill()
                         return
@@ -168,20 +168,20 @@ class mockingbirdTests: XCTestCase {
             }
         }
         
-        self.waitForExpectationsWithTimeout(2.0, handler: nil)
+        self.waitForExpectations(timeout: 2.0, handler: nil)
     }
     
     func testNonMatchingArgument() {
-        let expectation = self.expectationWithDescription("testArguments")
+        let expectation = self.expectation(description: "testArguments")
         
-        self.alamofire.request(.GET, "http://httpbin.org/get", parameters:["other": "foobar"]).response { (request, response, data, error) in
-            if let data = data {
-                let jsonString = String(data: data, encoding: NSUTF8StringEncoding)
+        self.alamofire.request("http://httpbin.org/get", method: .get, parameters: ["other": "foobar"]).response { (response) in
+            if let data = response.data {
+                let jsonString = String(data: data, encoding: String.Encoding.utf8)
                 XCTAssertNotNil(jsonString)
                 let json = JSONDecoder(jsonString!).jsonObject
-                guard case .JSONDictionary(let dict) = json where (dict["origin"] != nil && dict["args"] != nil),
-                    case .JSONString(let ip) = dict["origin"]!,
-                    case .JSONDictionary(let args) = dict["args"]! else {
+                guard case .jsonDictionary(let dict) = json, (dict["origin"] != nil && dict["args"] != nil),
+                    case .jsonString(let ip) = dict["origin"]!,
+                    case .jsonDictionary(let args) = dict["args"]! else {
                         XCTFail("Invalid data returned: \(jsonString)")
                         expectation.fulfill()
                         return
@@ -199,7 +199,7 @@ class mockingbirdTests: XCTestCase {
             }
         }
         
-        self.waitForExpectationsWithTimeout(2.0, handler: nil)
+        self.waitForExpectations(timeout: 2.0, handler: nil)
     }
 
 }
