@@ -92,14 +92,14 @@ open class MockingBird: URLProtocol {
     /// Register MockingBird with a NSURLSession
     ///
     /// - parameter session: the session to mock
-    open class func registerInSession(_ session: URLSession) {
-        self.registerInConfig(session.configuration)
+    open class func register(inSession session: URLSession) {
+        self.register(inConfig: session.configuration)
     }
 
     /// Register MockingBird in a NSURLSessionConfiguration
     ///
     /// - parameter config: session configuration to mock
-    open class func registerInConfig(_ config: URLSessionConfiguration) {
+    open class func register(inConfig config: URLSessionConfiguration) {
         var protocolClasses = config.protocolClasses
         if protocolClasses == nil {
             protocolClasses = [AnyClass]()
@@ -112,7 +112,7 @@ open class MockingBird: URLProtocol {
     ///
     /// - parameter bundlePath: path to the bundle
     /// - throws: MockingBird.Error when bundle could not be loaded
-    open class func setMockBundle(_ bundlePath: String?) throws {
+    open class func setMockBundle(withPath bundlePath: String?) throws {
         guard let bundlePath = bundlePath else {
             self.currentMockBundle = nil
             self.currentMockBundlePath = nil
@@ -153,7 +153,7 @@ extension MockingBird {
         }
         
         // we can answer all http and https requests
-        if let _ = self.getBundleItem(request.url!, method: request.httpMethod!) {
+        if let _ = self.getBundleItem(inURL: request.url!, method: request.httpMethod!) {
             return true
         }
         return self.handleAllRequests
@@ -171,7 +171,7 @@ extension MockingBird {
     
     open override func startLoading() {
         // fetch item
-        guard let entry = MockingBird.getBundleItem(self.request.url!, method: self.request.httpMethod!) else {
+        guard let entry = MockingBird.getBundleItem(inURL: self.request.url!, method: self.request.httpMethod!) else {
             
             if MockingBird.handleAllRequests {
                 // We're handling all requests, but no bundle item found
@@ -246,7 +246,7 @@ extension MockingBird {
         // do nothing
     }
     
-    fileprivate class func getBundleItem(_ inUrl: URL, method: String) -> MockBundleEntry? {
+    fileprivate class func getBundleItem(inURL inUrl: URL, method: String) -> MockBundleEntry? {
         let url = URLComponents(url: inUrl, resolvingAgainstBaseURL: false)!
         
         // find entry that matches

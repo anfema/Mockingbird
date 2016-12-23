@@ -23,12 +23,12 @@ class mockingbirdTests: XCTestCase {
         configuration.httpCookieAcceptPolicy = .never
         configuration.httpShouldSetCookies = false
         
-        MockingBird.registerInConfig(configuration)
+        MockingBird.register(inConfig: configuration)
         self.alamofire = Alamofire.SessionManager(configuration: configuration)
         
         let bundle = Bundle(for: type(of: self)).resourcePath! + "/bundles/httpbin"
         do {
-            try MockingBird.setMockBundle(bundle)
+            try MockingBird.setMockBundle(withPath: bundle)
         } catch {
             XCTFail("Could not reset mock bundle")
         }
@@ -43,7 +43,7 @@ class mockingbirdTests: XCTestCase {
         let expectation = self.expectation(description: "testReal")
         
         do {
-            try MockingBird.setMockBundle(nil)
+            try MockingBird.setMockBundle(withPath: nil)
         } catch {
             XCTFail("Could not disable mock bundle")
         }
