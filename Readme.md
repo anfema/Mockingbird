@@ -14,26 +14,30 @@ MockingBird is essentially only one Swift file (`mockingbird.swift`) but needs s
 
 ### CocoaPods
 
-Just include `pod 'anfema-mockingbird', '~> 1.0'` in your `Podfile`
+Just include `pod 'anfema-mockingbird', '~> 2.0'` in your `Podfile`
 
 ### Manual
 
 Just drop `mockingbird.swift` into your project.
 
+### Note
+
+For Swift 2.2 or 2.3 support, use Tags < 2.0.0
+
 ### Registering MockingBird with the URL loading system
 
-MockingBird makes it easy for you to register in `NSURLSession` objects, just call:
+MockingBird makes it easy for you to register in `URLSession` objects, just call:
 
 ~~~swift
-let session:NSURLSession = ...
-MockingBird.registerInSession(session)
+let session:URLSession = ...
+MockingBird.register(inSession: session)
 ~~~
 
-If you're using _Alamofire_ you likely have access to the session configuration when creating your `Alamofire.Manager`:
+If you're using _Alamofire_ you likely have access to the session configuration when creating your `Alamofire.SessionManager`:
 
 ~~~swift
-let configuration: NSURLSessionConfiguration = NSURLSessionConfiguration.defaultSessionConfiguration()
-MockingBird.registerInConfig(configuration)
+let configuration: URLSessionConfiguration = URLSessionConfiguration.default
+MockingBird.register(inConfig: configuration)
 ~~~
 
 ## How to mock
@@ -91,18 +95,18 @@ import anfema_mockingbird  // needed only for install via cocoapods
 import Alamofire
 
 class mockingbirdTests: XCTestCase {
-    var alamofire: Alamofire.Manager! = nil
+    var alamofire: Alamofire.SessionManager! = nil
     
     override func setUp() {
         super.setUp()
         
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
-        MockingBird.registerInConfig(configuration)
-        self.alamofire = Alamofire.Manager(configuration: configuration)
+        let configuration: URLSessionConfiguration = URLSessionConfiguration.default
+        MockingBird.register(inConfig: configuration)
+        self.alamofire = Alamofire.SessionManager(configuration: configuration)
 
-        let bundle = NSBundle(forClass: self.dynamicType).resourcePath! + "/bundles/httpbin"
+        let bundle = Bundle(for: type(of: self)).resourcePath! + "/bundles/httpbin"
         do {
-            try MockingBird.setMockBundle(bundle)
+            try MockingBird.setMockBundle(withPath: bundle)
         } catch {
             XCTFail("Could not reset mock bundle")
         }
@@ -113,7 +117,7 @@ class mockingbirdTests: XCTestCase {
 The interesting thing here is how to get to the Mock-Bundle path:
 
 ~~~swift
-let bundle = NSBundle(forClass: self.dynamicType).resourcePath! + "/bundles/httpbin"
+let bundle = Bundle(for: type(of: self)).resourcePath! + "/bundles/httpbin"
 ~~~
 
 `bundles/httpbin` is the name of your bundle folder reference you included.
@@ -122,13 +126,13 @@ Now every HTTP(S) request that will be sent through `self.alamofire` will be che
 
 #### Default URL-Loading system
 
-You can register the MockingBird on an even lower level if you have not converted to using `NSURLSession` yet:
+You can register the MockingBird on an even lower level if you have not converted to using `URLSession` yet:
 
 ~~~swift
-NSURLProtocol.registerClass(MockingBird)
+URLProtocol.registerClass(MockingBird.self)
 ~~~
 
-But beware, if you're using an `NSURLSession` with this set, it will not work for the sessions, this one works only for the old version without `NSURLSession`
+But beware, if you're using an `URLSession` with this set, it will not work for the sessions, this one works only for the old version without `URLSession`
 
 #### Handle all requests
 
