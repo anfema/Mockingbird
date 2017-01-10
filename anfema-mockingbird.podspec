@@ -26,5 +26,5 @@ Pod::Spec.new do |s|
   s.framework  = "Alamofire", "DEjson"
 
   s.dependency "Alamofire", "~> 4.2"
-  s.dependency "DEjson"
+  s.dependency "DEjson", "~> 2.0"
 end
