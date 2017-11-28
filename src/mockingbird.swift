@@ -179,7 +179,7 @@ extension MockingBird {
                 var headers = [String: String]()
                 headers["Content-Type"] = "text/plain"
                 
-                let errorMsg = "Mockingbird response not available.  Please add a response to the bundle at \(MockingBird.currentMockBundlePath)."
+                let errorMsg = "Mockingbird response not available.  Please add a response to the bundle at \(String(describing: MockingBird.currentMockBundlePath))."
                 let data = errorMsg.data(using: String.Encoding.utf8)
                 if let data = data {
                     headers["Content-Length"] = "\(data.count)"
