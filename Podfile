@@ -4,7 +4,7 @@ use_frameworks!
 
 def shared_pods
     pod 'Alamofire', '~> 4.2'
-    pod 'DEjson', :git => 'https://github.com/anfema/DEjson', :branch => 'swift_3'
+    pod 'DEjson', :git => 'https://github.com/anfema/DEjson', :branch => 'master'
 end
 
 target 'mockingbird_ios' do

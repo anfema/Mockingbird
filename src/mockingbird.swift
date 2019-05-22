@@ -81,7 +81,7 @@ open class MockingBird: URLProtocol {
     // If this is true, we'll claim to answer all URL requests.
     // If this is false, URLs that don't match will be passed on
     //      through to normal handlers.
-    open static var handleAllRequests: Bool = false
+    public static var handleAllRequests: Bool = false
 
     public enum MBError: Error {
         case mockBundleNotFound
@@ -179,7 +179,7 @@ extension MockingBird {
                 var headers = [String: String]()
                 headers["Content-Type"] = "text/plain"
                 
-                let errorMsg = "Mockingbird response not available.  Please add a response to the bundle at \(MockingBird.currentMockBundlePath)."
+                let errorMsg = "Mockingbird response not available.  Please add a response to the bundle at \(MockingBird.currentMockBundlePath ?? "nil")."
                 let data = errorMsg.data(using: String.Encoding.utf8)
                 if let data = data {
                     headers["Content-Length"] = "\(data.count)"

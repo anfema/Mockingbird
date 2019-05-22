@@ -1,25 +1,29 @@
 PODS:
   - Alamofire (4.2.0)
-  - DEjson (1.0.3)
+  - DEjson (4.0.0)
 
 DEPENDENCIES:
   - Alamofire (~> 4.2)
-  - DEjson (from `https://github.com/anfema/DEjson`, branch `swift_3`)
+  - DEjson (from `https://github.com/anfema/DEjson`, branch `master`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Alamofire
 
 EXTERNAL SOURCES:
   DEjson:
-    :branch: swift_3
+    :branch: master
     :git: https://github.com/anfema/DEjson
 
 CHECKOUT OPTIONS:
   DEjson:
-    :commit: 527ad2c337ebdd51d9c224bf86b6655284cb8805
+    :commit: bfdf06124c1fc3040c7cef47434b3043b88970b2
     :git: https://github.com/anfema/DEjson
 
 SPEC CHECKSUMS:
   Alamofire: aa2e09d871c9160ac53c90e83c68064a94e3dfbe
-  DEjson: b647d67d4106889a7739063567bbaff7111af6df
+  DEjson: 0289c921f19778a6dc4d1d4d7f0ffd4b2c4cafad
 
-PODFILE CHECKSUM: f1a7857bed6134e627f525a55bfade6641dc4fe8
+PODFILE CHECKSUM: 4a0a0eb1f8ec4c67439a2ae875e5066356f0f77c
 
-COCOAPODS: 1.1.1
+COCOAPODS: 1.6.1

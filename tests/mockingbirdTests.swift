@@ -182,7 +182,7 @@ class mockingbirdTests: XCTestCase {
                 guard case .jsonDictionary(let dict) = json, (dict["origin"] != nil && dict["args"] != nil),
                     case .jsonString(let ip) = dict["origin"]!,
                     case .jsonDictionary(let args) = dict["args"]! else {
-                        XCTFail("Invalid data returned: \(jsonString)")
+                        XCTFail("Invalid data returned: \(jsonString ?? "nil")")
                         expectation.fulfill()
                         return
                 }
