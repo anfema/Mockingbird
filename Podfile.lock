@@ -7,7 +7,7 @@ DEPENDENCIES:
   - DEjson (from `https://github.com/anfema/DEjson`, branch `master`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  trunk:
     - Alamofire
 
 EXTERNAL SOURCES:
@@ -22,8 +22,8 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
-  DEjson: 0289c921f19778a6dc4d1d4d7f0ffd4b2c4cafad
+  DEjson: 4344603627c3628b09b6f84d805f5d506f26b97e
 
-PODFILE CHECKSUM: f6a3e9d3dfe8fd515c81ba5af28a1b308f377365
+PODFILE CHECKSUM: 54c3b7e379b3138d36372125708fc8dd830e26dd
 
-COCOAPODS: 1.6.1
+COCOAPODS: 1.11.2
