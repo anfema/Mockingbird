@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "anfema-mockingbird"
-  s.version      = "4.0.0"
+  s.version      = "5.0.0"
   s.summary      = "HTTP-Response mocking for iOS and OS X."
   s.description  = <<-DESC
                    HTTP-Response mocking for iOS and OS X
@@ -17,16 +17,16 @@ Pod::Spec.new do |s|
   s.author             = { "Johannes Schriewer" => "j.schriewer@anfe.ma" }
   s.social_media_url   = "http://twitter.com/dunkelstern"
 
-  s.ios.deployment_target = "8.4"
-  s.osx.deployment_target = "10.10"
+  s.ios.deployment_target = "13.0"
+  s.osx.deployment_target = "11.0"
 
-  s.source       = { :git => "https://github.com/anfema/Mockingbird.git", :tag => "4.0.0" }
+  s.source       = { :git => "https://github.com/anfema/Mockingbird.git", :tag => "5.0.0" }
   s.source_files  = "src/*.swift"
   
   s.framework  = "Alamofire", "DEjson"
 
   s.dependency "Alamofire", "~> 4.2"
-  s.dependency "DEjson", "~> 4.0"
+  s.dependency "DEjson", "~> 5.0"
 
   s.swift_version = '5.0'
 end
