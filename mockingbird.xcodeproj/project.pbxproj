@@ -87,6 +87,8 @@
 		31408F512C232076610C13D9 /* Pods-mockingbird_osx_host.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mockingbird_osx_host.release.xcconfig"; path = "Pods/Target Support Files/Pods-mockingbird_osx_host/Pods-mockingbird_osx_host.release.xcconfig"; sourceTree = "<group>"; };
 		49E865BFA8D686A79EBECC7F /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FB069409027504CBF43D6B1 /* Pods_mockingbird_osx.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_mockingbird_osx.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5CC10470276C7ABA004577BE /* Readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
+		5CC10471276C7ABA004577BE /* anfema-mockingbird.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = "anfema-mockingbird.podspec"; sourceTree = "<group>"; };
 		5E4C6377B61621A86A16F7FF /* Pods_mockingbird_ios_tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_mockingbird_ios_tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6675749CC1F01B5B77801D6E /* Pods-mockingbird_osx.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mockingbird_osx.release.xcconfig"; path = "Pods/Target Support Files/Pods-mockingbird_osx/Pods-mockingbird_osx.release.xcconfig"; sourceTree = "<group>"; };
 		775224E3198E7E37175AA548 /* Pods-mockingbird_ios_host.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mockingbird_ios_host.debug.xcconfig"; path = "Pods/Target Support Files/Pods-mockingbird_ios_host/Pods-mockingbird_ios_host.debug.xcconfig"; sourceTree = "<group>"; };
@@ -207,6 +209,8 @@
 		8F0DB0691C0F48E200193E8C = {
 			isa = PBXGroup;
 			children = (
+				5CC10470276C7ABA004577BE /* Readme.md */,
+				5CC10471276C7ABA004577BE /* anfema-mockingbird.podspec */,
 				8F0DB0A91C0F495D00193E8C /* support */,
 				8F0DB0AA1C0F497900193E8C /* src */,
 				8F0DB0811C0F48E200193E8C /* tests */,
